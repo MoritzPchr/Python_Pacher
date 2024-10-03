@@ -1,18 +1,17 @@
 import random
 
-def ziehung():
-    zahlenliste = list(range(1, 46))  # Liste der Zahlen von 1 bis 46-1
+lottozahlen = 45
+def ziehung(lottozahlen):
+    zahlenliste = [i for i in range(lottozahlen)]  # Liste der Zahlen von 0 bis 44
     gezogene_zahlen = [] # Liste für gezogene Zahlen
 
     for i in range(5):
-        letzte_stelle = 44 - i
-        zufallszahl = random.randint(0, letzte_stelle)  # Zufälliger Integer zwische 0. und letzter Stelle --> random.getrand() nicht gefunden
+        letzte_stelle = (lottozahlen-1) - i
+        zufallszahl = random.randint(0,letzte_stelle)  # Zufälliger Integer bis letzter Stelle --> random.getrand() nicht gefunden
         gezogene_zahlen.append(zahlenliste[zufallszahl])  # Füge die gezogene Zahl zur Ergebnisliste hinzu
 
         # Werte an den Stellen tauschen
-        a = zahlenliste[zufallszahl]
-        zahlenliste[zufallszahl] = zahlenliste[letzte_stelle]
-        zahlenliste[letzte_stelle] = a
+        zahlenliste[zufallszahl], zahlenliste[letzte_stelle] = zahlenliste[letzte_stelle], zahlenliste[zufallszahl]
 
     return gezogene_zahlen
 
@@ -20,18 +19,17 @@ def statistik_aktualisieren(statistik, gezogene_zahlen):
     for zahl in gezogene_zahlen:
         statistik[zahl] += 1  #für jede gezogene Zahl "Counter plus 1"
 
-def main():
-    statistik = {i: 0 for i in range(1, 46)}  #Dictionary für die Statistik
+def main(lottozahlen):
+    statistik = {i: 0 for i in range(lottozahlen)}  #Dictionary für die Statistik
 
-    # 1000 Ziehungen
-    for i in range(100000):
-        gezogene_zahlen = ziehung()  # Führe eine Ziehung durch
+    for _ in range(100000):
+        gezogene_zahlen = ziehung(lottozahlen)  # Führe eine Ziehung durch
         statistik_aktualisieren(statistik, gezogene_zahlen)  # Aktualisiere die Statistik
 
     # Ausgabe der Statistik (Häufigkeit pro Zahl ausgeben)
     print("Statistik:")
     for zahl, haeufigkeit in statistik.items():
-        print("Zahl " + str(zahl) + ": " + str(haeufigkeit) + " mal gezogen")
+        print("Zahl " + str(zahl+1) + ": " + str(haeufigkeit) + " mal gezogen")
 
 if __name__ == "__main__":
-    main()
+    main(lottozahlen)
