@@ -1,64 +1,47 @@
-# Zählt die Anzahl von Karten mit gleichem Symbol in der Hand
-def hand_amount_same_symbol(hand: List[tuple[int, int]]) -> List[int]:
-    symbols = [card[0] for card in hand]
-    return [symbols.count(s) for s in set(symbols)]
+import random
+from typing import List
+
+# Poker Kombinationen:
+# 0 High Card: Höchste Karte
+# 1 One Pair: Ein Paar, gleiches Symbol
+# 2 Two Pairs: Zwei Paare
+# 3 Three of a Kind: Drilling
+# 4 Straight: Fünf aufeinanderfolgende Symbole, verschiedene Farben
+# 5 Flush: Fünf Karten der gleichen Farbe
+# 6 Full House: Drilling und ein Paar
+# 7 Four of a Kind: Vier gleiche Symbole
+# 8 Straight Flush: Fünf aufeinanderfolgende Symbole, gleiche Farbe
+# 9 Royal Flush: 10, J, Q, K, A, gleiche Farbe
 
 
-# Überprüft, ob eine Hand eine bestimmte Anzahl von Karten mit gleichem Symbol enthält
-def hand_is_same_symbol(hand: List[tuple[int, int]], matches: List[int]) -> bool:
-    counts = hand_amount_same_symbol(hand)
-    for match in matches:
-        if match not in counts:
-            return False
-        counts.remove(match)
-    return True
+#Karten als Zahlen 0-51: Die Karten werden wie vorher als Zahlen 0-51 dargestellt.
+# Jede Karte wird durch karte // 4 (Symbol) und karte % 4 (Farbe) aufgeschlüsselt.
 
 
-# Zählt die Anzahl von Karten mit gleicher Farbe in der Hand
-def hand_amount_same_color(hand: List[tuple[int, int]]) -> List[int]:
-    colors = [card[1] for card in hand]
-    return [colors.count(c) for c in set(colors)]
+def main(hand_size=5, max_hands=100000):
+    combinations = {
+        0: "High Card",
+        1: "One Pair",
+        2: "Two Pairs",
+        3: "Three of a Kind",
+        4: "Straight",
+        5: "Flush",
+        6: "Full House",
+        7: "Four of a Kind",
+        8: "Straight Flush",
+        9: "Royal Flush"
+    }
 
+    # Statistik, wie oft jede Kombination vorkommt
+    combination_statistic = {k: 0 for k in combinations}
 
-# Überprüft, ob eine Hand eine bestimmte Anzahl von Karten mit gleicher Farbe enthält
-def hand_is_same_color(hand: List[tuple[int, int]], matches: List[int]) -> bool:
-    counts = hand_amount_same_color(hand)
-    for match in matches:
-        if match not in counts:
-            return False
-        counts.remove(match)
-    return True
+    # Simuliere mehrere Hände
+    for _ in range(max_hands):
+        hand = random.sample(range(52), hand_size)  # Ziehe eine zufällige Hand (5 Karten von 0-51)
+        comb_type = combination_type(hand)  # Bestimme die Kombination
+        combination_statistic[comb_type] += 1
 
+    # Ausgabe der Ergebnisse
+    for comb_type, count in combination_statistic.items():
+        print(f"{combinations[comb_type]}: {count} ({count / max_hands * 100:.2f}%)")
 
-# Bestimmt die Art der Pokerkombination
-def combination_type(hand: List[tuple[int, int]], max_symbols=13, max_colors=4, amount=5) -> int:
-    hand.sort(key=lambda x: x[0])  # Sortiert die Hand nach Symbolen
-
-    if hand_is_same_color(hand, [5]) and all(hand[i][0] == 8 + i for i in range(5)):
-        return 9  # Royal Flush
-    if hand_is_same_color(hand, [5]) and all(hand[i][0] == hand[0][0] + i for i in range(5)):
-        return 8  # Straight Flush
-    if hand_is_same_symbol(hand, [4]):
-        return 7  # Four of a Kind
-    if hand_is_same_symbol(hand, [3, 2]):
-        return 6  # Full House
-    if hand_is_same_color(hand, [5]):
-        return 5  # Flush
-    if all(hand[i][0] == hand[0][0] + i for i in range(5)):
-        return 4  # Straight
-    if hand_is_same_symbol(hand, [3]):
-        return 3  # Three of a Kind
-    if hand_is_same_symbol(hand, [2, 2]):
-        return 2  # Two Pairs
-    if hand_is_same_symbol(hand, [2]):
-        return 1  # One Pair
-    return 0  # High Card
-
-
-# Erzeugt eine zufällige Hand
-def random_hand(max_symbols=13, max_colors=4, hand_size=5) -> List[tuple[int, int]]:
-    deck = [(i, j) for i in range(max_symbols) for j in range(max_colors)]
-    return random.sample(deck, hand_size)
-
-if __name__ == "__main__":
-    main()
