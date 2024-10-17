@@ -1,24 +1,23 @@
 import random
 from typing import List
 
-# Poker Kombinationen:
+#Kombinationen:
 # 0 High Card: Höchste Karte
-# 1 One Pair: Ein Paar, gleiches Symbol
-# 2 Two Pairs: Zwei Paare
-# 3 Three of a Kind: Drilling
+# 1 One Pair
+# 2 Two Pairs
+# 3 Three of a Kind
 # 4 Straight: Fünf aufeinanderfolgende Symbole, verschiedene Farben
 # 5 Flush: Fünf Karten der gleichen Farbe
 # 6 Full House: Drilling und ein Paar
-# 7 Four of a Kind: Vier gleiche Symbole
+# 7 Four of a Kind: Vier gleiche Symb.
 # 8 Straight Flush: Fünf aufeinanderfolgende Symbole, gleiche Farbe
 # 9 Royal Flush: 10, J, Q, K, A, gleiche Farbe
-
 
 #Karten als Zahlen 0-51: Die Karten werden wie vorher als Zahlen 0-51 dargestellt.
 # Jede Karte wird durch karte // 4 (Symbol) und karte % 4 (Farbe) aufgeschlüsselt.
 
 
-def main(hand_size=5, max_hands=100000):
+def main(hand_size=5, max_hands=400000):
     combinations = {
         0: "High Card",
         1: "One Pair",
@@ -32,16 +31,58 @@ def main(hand_size=5, max_hands=100000):
         9: "Royal Flush"
     }
 
-    # Statistik, wie oft jede Kombination vorkommt
-    combination_statistic = {k: 0 for k in combinations}
+    # Statistik-Dict, wie oft jede Kombination vorkommt
+    combination_statistic = {i: 0 for i in combinations}
 
     # Simuliere mehrere Hände
     for _ in range(max_hands):
-        hand = random.sample(range(52), hand_size)  # Ziehe eine zufällige Hand (5 Karten von 0-51)
+        hand = random.sample(range(52), hand_size)  # Ziehe eine zufällige Hand (5 Karten von 0-51) --> durch random.sample
+                                                    # kann jedes Element nur einmal gewählt werden
         comb_type = combination_type(hand)  # Bestimme die Kombination
-        combination_statistic[comb_type] += 1
+        combination_statistic[comb_type] += 1 #counter für Kombination
 
-    # Ausgabe der Ergebnisse
-    for comb_type, count in combination_statistic.items():
-        print(f"{combinations[comb_type]}: {count} ({count / max_hands * 100:.2f}%)")
+    # Ausgabe der Ergebnisse + Anzahl in Prozent count / max_hands
+    for comb_type, count in combination_statistic.items(): #Die Schleife geht über jedes Schlüssel-Wert-Paar im Dictionary combination_statistic.
+        print(f"{combinations[comb_type]}: {count} ({count / max_hands * 100:.5f}%)")
+        #combinations[comb_type]: Der Name der Pokerkombination (z.B. "One Pair").
 
+def combination_type(hand: List[int]) -> int:
+    symbols = sorted(card // 4 for card in hand)  # sorted in aufsteigender reihenfolge (leicher Vgl.)
+    #Symbol: z.B. 4 -->wird die Zahl durch 4 ganzzahlig dividiert (//)
+
+    colors = [card % 4 for card in hand] #Farbe --> wird der Rest der Division (Modolo 4)
+    # Farben (REST: 0 = Pik, 1 = Kreuz, 2 = Karo, 3 = Herz)
+
+    #Ein Set kann nur eindeutige Elemente haben --> durch Umwandlung keine doppelten Farben
+    #mit len() wird die Anazhl an Elementen gezählt
+    flush = len(set(colors)) == 1  #len == 1 --> alle haben die gleiche Farbe
+
+    #all() prüft, ob alle Bedingungen in Schleife true sind
+    straight = all(symbols[i] == symbols[0] + i for i in range(5))# ob jedes Symbol um 1 größer ist als das vorherige.
+
+    #[symbols.count(s) for s in set(symbols)] erstellt  Liste --> jedes  Symbol +  Anzahl speichert (dann sortiert)
+    counts = sorted([symbols.count(s) for s in set(symbols)]) #symbols.count(s) zählt, wie oft jedes Symbol s vorkommt
+
+    if flush and symbols == [8, 9, 10, 11, 12]:
+        return 9  # Royal Flush
+    if flush and straight:
+        return 8  # Straight Flush
+    if counts == [1, 4]:
+        return 7  # Four of a Kind
+    if counts == [2, 3]:
+        return 6  # Full House
+    if flush:
+        return 5  # Flush
+    if straight:
+        return 4  # Straight
+    if counts == [1, 1, 3]:
+        return 3  # Three of a Kind
+    if counts == [1, 2, 2]:
+        return 2  # Two Pairs
+    if counts == [1, 1, 1, 2]:
+        return 1  # One Pair
+    return 0  # High Card
+
+
+if __name__ == "__main__":
+    main()
