@@ -1,0 +1,60 @@
+class Room:
+    zimmernummer = 1
+    zimmerliste = []
+
+    def __init__(self, zimmertyp, price):
+        self.nummer = Room.zimmernummer
+        Room.zimmernummer += 1
+        self.zimmertyp = zimmertyp
+        self.price = price
+        self.availability = True
+        Room.zimmerliste.append(self)
+
+    @classmethod
+    def book_room(cls, zimmertyp):
+        for room in cls.zimmerliste:
+            if room.zimmertyp == zimmertyp and room.availability == True:
+                room.availability = False
+                return f"Zimmer {room.nummer} gebucht."
+        return "Kategorie nicht mehr frei."
+
+    @classmethod
+    def cancel_booking(cls, zimmernummer):
+        for room in cls.zimmerliste:
+            if room.nummer == zimmernummer:
+                room.availability = True
+                return f"Buchung für Zimmer {zimmernummer} storniert."
+        return "Zimmernummer nicht gefunden."
+
+    @classmethod
+    def get_all_rooms(cls):
+        return [
+            f"Zimmer {room.nummer}: {room.zimmertyp}, Preis: {room.price}€, Verfügbarkeit: {room.availability}"
+            for room in cls.zimmerliste]
+
+    @classmethod
+    def get_free_rooms(cls):
+        return len([room for room in cls.zimmerliste if room.availability])
+
+
+class Main:
+    room1 = Room("Einzelzimmer", 50)
+    room2 = Room("Einzelzimmer", 55)
+    room3 = Room("Doppelzimmer", 80)
+    print(Room.get_all_rooms())
+
+    print(Room.book_room("Einzelzimmer"))
+    print(Room.book_room("Einzelzimmer"))
+    print(Room.book_room("Einzelzimmer"))
+    print(Room.get_all_rooms())
+    print(f"Anzahl freie Zimmer: {Room.get_free_rooms()}\n")
+    print(Room.cancel_booking(1))
+    print(Room.get_all_rooms())
+    print(f"Anzahl freie Zimmer: {Room.get_free_rooms()}\n")
+
+
+
+
+
+
+
